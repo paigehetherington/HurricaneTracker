@@ -3,6 +3,7 @@ package com.theironyard;
 //FROM ZACH OAKES SPARK LECTURE
 
 import spark.ModelAndView;
+import spark.Request;
 import spark.Session;
 import spark.Spark;
 
@@ -122,10 +123,41 @@ public class Main {
                     Spark.get(
                             "/edit-hurricane",
                             (request1, response1) -> {
-                                return  new ModelAndView(null, "/edit.html");
+                                int id = Integer.valueOf(request.queryParams("id"));
+                                Hurricane hurricane = hurricanes.get(id);
+                                if (hurricane == null)
 
                             }
+                        return new ModelAndView(null, "/edit.html");
                     );
+
+        Spark.post(
+                "/edit-hurricane",
+                ((request, response) ->  {
+                    Session session = request.session();
+                    String name = session.attribute("loginName");
+                    User user = users.get(name);
+
+                    if (user == null) {
+                        return null;
+                    }
+                    int id = Integer.valueOf(request.queryParams("id"));
+
+                    Hurricane hurricane = hurricanes.get(id);
+
+                    if (hurricanes.get(id) == null || !hurricanes.get(id).isMe) {
+                        return null;
+                    hurricane.name = request.queryParams("hname");
+                    hurricane.location = request.queryParams("hlocation");
+                    hurricane.category= Enum.valueOf(Hurricane.Category.class, request.queryParams("hcategory"));
+                    hurricane.image = request.queryParams("himage");
+
+                        response.redirect("/");
+
+
+                    return null;
+                }
+        );
 
 
     }

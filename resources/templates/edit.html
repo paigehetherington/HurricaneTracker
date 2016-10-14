@@ -1,5 +1,19 @@
 <html>
 <body>
-
+<form action="/edit-hurricane" method="post">
+    <input type="hidden" value="{{id}}" name="id"/>
+    <input type="text" value="{{name}}" name="hname"/><br>
+    <input type="text" valuee="{{location}}" name="hlocation"/><br>
+    <select name="hcategory">
+        <option selected disabled>Category</option>
+        <option value="ONE">1</option>
+        <option value="TWO">2</option>
+        <option value="THREE">3</option>
+        <option value="FOUR">4</option>
+        <option value="FIVE">5</option>
+    </select>
+    <input type="text" value="{{image}}" name="himage" width="200"/><br>
+    <button type="submit">Submit Hurricane</button>
+</form>
 </body>
 </html>
