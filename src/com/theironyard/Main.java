@@ -28,6 +28,9 @@ public class Main {
                     if (user != null) {
                         m.put("name", user.name);
                     }
+                    for (Hurricane h : hurricanes) {
+                        h.isMe = user != null && h.user.name.equals(user.name);
+                    }
                     m.put("hurricanes", hurricanes);
                     return new ModelAndView(m, "home.html");
 
@@ -83,13 +86,47 @@ public class Main {
                     String hlocation = request.queryParams("hlocation");
                     Hurricane.Category hcategory = Enum.valueOf(Hurricane.Category.class, request.queryParams("hcategory"));
                     String himage = request.queryParams("himage");
-                    Hurricane h = new Hurricane(hname, hlocation, hcategory, himage, user);
+                    Hurricane h = new Hurricane(hurricanes.size(), hname, hlocation, hcategory, himage, user, false);
                     hurricanes.add(h);
 
                     response.redirect("/");
                     return null;
                 }
         );
+
+        Spark.post(
+                "/delete-hurricane",
+                (request, response) ->  {
+                    Session session = request.session();
+                    String name = session.attribute("loginName");
+                    User user = users.get(name);
+
+                    if (user == null) {
+                        return null;
+                    }
+
+                    int id = Integer.valueOf(request.queryParams("id"));
+
+                    if (hurricanes.get(id) == null || !hurricanes.get(id).isMe) {
+                        return null;
+                    }
+                    hurricanes.remove(id-1);
+                    for (int i = 0; i >hurricanes.size(); i++) {
+                        hurricanes.get(i).id = i;
+
+                    }
+                    response.redirect("/");
+                    return null;
+                }
+        );
+                    Spark.get(
+                            "/edit-hurricane",
+                            (request1, response1) -> {
+                                return  new ModelAndView(null, "/edit.html");
+
+                            }
+                    );
+
 
     }
 }
