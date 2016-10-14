@@ -6,6 +6,7 @@ import spark.ModelAndView;
 import spark.Request;
 import spark.Session;
 import spark.Spark;
+import spark.template.mustache.MustacheTemplateEngine;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -120,16 +121,19 @@ public class Main {
                     return null;
                 }
         );
-                    Spark.get(
-                            "/edit-hurricane",
-                            (request1, response1) -> {
-                                int id = Integer.valueOf(request.queryParams("id"));
-                                Hurricane hurricane = hurricanes.get(id);
-                                if (hurricane == null)
+        Spark.get(
+                "/edit-hurricane",
+                (request1, response1) -> {
+                    int id = Integer.valueOf(request1.queryParams("id"));
+                    Hurricane hurricane = hurricanes.get(id);
+                    if (hurricane == null) {
+                        return null;
+                    }
+                    return new ModelAndView(hurricane, "edit.html");
+                },
+                new MustacheTemplateEngine()
+        );
 
-                            }
-                        return new ModelAndView(null, "/edit.html");
-                    );
 
         Spark.post(
                 "/edit-hurricane",
@@ -147,6 +151,7 @@ public class Main {
 
                     if (hurricanes.get(id) == null || !hurricanes.get(id).isMe) {
                         return null;
+                    }
                     hurricane.name = request.queryParams("hname");
                     hurricane.location = request.queryParams("hlocation");
                     hurricane.category= Enum.valueOf(Hurricane.Category.class, request.queryParams("hcategory"));
@@ -157,7 +162,7 @@ public class Main {
 
                     return null;
                 }
-        );
+        ));
 
 
     }
